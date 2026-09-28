@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Trash2, Edit3 } from 'lucide-react';
+import { X, Trash2, Edit3, Lock } from 'lucide-react';
 import { Device } from '../types';
 import { DeviceIcon, DEVICE_METADATA } from './DeviceIcon';
 
@@ -8,6 +8,7 @@ interface DeviceSettingsModalProps {
   onUpdate: (updated: Partial<Device>) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
+  isLocked?: boolean;
 }
 
 export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({
@@ -15,6 +16,7 @@ export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({
   onUpdate,
   onDelete,
   onClose,
+  isLocked = false,
 }) => {
   const [name, setName] = useState(device.name);
   const [ip, setIp] = useState(device.ip);
@@ -74,16 +76,23 @@ export const DeviceSettingsModal: React.FC<DeviceSettingsModalProps> = ({
         </div>
 
         <div className="flex items-center justify-between pt-5 mt-5 border-t border-slate-800">
-          <button
-            onClick={() => {
-              onDelete(device.id);
-              onClose();
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition text-xs"
-          >
-            <Trash2 size={14} />
-            <span>Delete Device</span>
-          </button>
+          {isLocked ? (
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-400/90 font-medium">
+              <Lock size={12} />
+              <span>Preset Locked (Cannot delete)</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                onDelete(device.id);
+                onClose();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition text-xs"
+            >
+              <Trash2 size={14} />
+              <span>Delete Device</span>
+            </button>
+          )}
           <button
             onClick={handleSave}
             className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs shadow-md transition"

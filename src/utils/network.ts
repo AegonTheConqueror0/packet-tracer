@@ -1,5 +1,9 @@
-import { Device, Link } from '../types';
+import { Device, Link, PingHop, PingReport } from '../types';
 
+/**
+ * Dijkstra's shortest path routing algorithm based on link latency
+ * Matches real router metric cost (e.g. OSPF)
+ */
 export function findPath(
   sourceId: string,
   targetId: string,
@@ -8,7 +12,7 @@ export function findPath(
 ): { path: string[]; links: Link[]; totalLatency: number } | null {
   if (sourceId === targetId) return null;
 
-  // Build adjacency list
+  // Build adjacency list (ignoring broken links)
   const adj = new Map<string, { neighborId: string; link: Link }[]>();
   devices.forEach((d) => adj.set(d.id, []));
 
@@ -20,37 +24,88 @@ export function findPath(
     }
   });
 
-  // BFS for simplest hop path
-  const queue: { id: string; path: string[]; linkPath: Link[]; latency: number }[] = [
-    { id: sourceId, path: [sourceId], linkPath: [], latency: 0 },
-  ];
-  const visited = new Set<string>([sourceId]);
+  // Dijkstra priority queue using latency as weight
+  const distances = new Map<string, number>();
+  const previous = new Map<
+    string,
+    { fromId: string; link: Link; hopCount: number } | null
+  >();
+  const unvisited = new Set<string>();
 
-  while (queue.length > 0) {
-    const current = queue.shift()!;
-    if (current.id === targetId) {
-      return {
-        path: current.path,
-        links: current.linkPath,
-        totalLatency: current.latency,
-      };
+  devices.forEach((d) => {
+    distances.set(d.id, d.id === sourceId ? 0 : Infinity);
+    previous.set(d.id, null);
+    unvisited.add(d.id);
+  });
+
+  while (unvisited.size > 0) {
+    // Find unvisited node with smallest distance
+    let currentId: string | null = null;
+    let minDistance = Infinity;
+
+    for (const id of unvisited) {
+      const dist = distances.get(id)!;
+      if (dist < minDistance) {
+        minDistance = dist;
+        currentId = id;
+      }
     }
 
-    const neighbors = adj.get(current.id) || [];
+    if (!currentId || minDistance === Infinity) break;
+    if (currentId === targetId) break;
+
+    unvisited.delete(currentId);
+
+    const currentDist = distances.get(currentId)!;
+    const currentPrev = previous.get(currentId);
+    const currentHops = currentPrev ? currentPrev.hopCount : 0;
+
+    const neighbors = adj.get(currentId) || [];
     for (const { neighborId, link } of neighbors) {
-      if (!visited.has(neighborId)) {
-        visited.add(neighborId);
-        queue.push({
-          id: neighborId,
-          path: [...current.path, neighborId],
-          linkPath: [...current.linkPath, link],
-          latency: current.latency + link.latencyMs,
-        });
+      if (!unvisited.has(neighborId)) continue;
+
+      const newDist = currentDist + link.latencyMs;
+      const existingDist = distances.get(neighborId)!;
+
+      // Prefer shorter latency; tie-break on fewer hops
+      if (
+        newDist < existingDist ||
+        (newDist === existingDist && currentHops + 1 < (previous.get(neighborId)?.hopCount ?? Infinity))
+      ) {
+        distances.set(neighborId, newDist);
+        previous.set(neighborId, { fromId: currentId, link, hopCount: currentHops + 1 });
       }
     }
   }
 
-  return null;
+  // Target unreachable
+  if (distances.get(targetId) === Infinity) {
+    return null;
+  }
+
+  // Reconstruct path
+  const path: string[] = [];
+  const linkPath: Link[] = [];
+  let curr: string | null = targetId;
+
+  while (curr) {
+    path.unshift(curr);
+    const prevEntry = previous.get(curr);
+    if (prevEntry) {
+      linkPath.unshift(prevEntry.link);
+      curr = prevEntry.fromId;
+    } else {
+      curr = null;
+    }
+  }
+
+  if (path[0] !== sourceId) return null;
+
+  return {
+    path,
+    links: linkPath,
+    totalLatency: distances.get(targetId)!,
+  };
 }
 
 export function getLinkBetween(
@@ -63,6 +118,119 @@ export function getLinkBetween(
       (l.fromId === fromId && l.toId === toId) ||
       (l.fromId === toId && l.toId === fromId)
   );
+}
+
+/**
+ * Calculates a complete, accurate Ping report with exact RTT and ICMP metrics
+ */
+export function calculateAccuratePingReport(
+  sourceId: string,
+  targetId: string,
+  devices: Device[],
+  links: Link[]
+): PingReport {
+  const sourceDev = devices.find((d) => d.id === sourceId) || {
+    id: sourceId,
+    name: 'Unknown Source',
+    ip: '0.0.0.0',
+    type: 'pc' as const,
+    x: 0,
+    y: 0,
+  };
+
+  const targetDev = devices.find((d) => d.id === targetId) || {
+    id: targetId,
+    name: 'Unknown Target',
+    ip: '0.0.0.0',
+    type: 'pc' as const,
+    x: 0,
+    y: 0,
+  };
+
+  const route = findPath(sourceId, targetId, devices, links);
+
+  if (!route) {
+    // Check if source has any connected link
+    const sourceLinks = links.filter((l) => l.fromId === sourceId || l.toId === sourceId);
+    let reason = 'Destination Host Unreachable (No physical route found)';
+
+    if (sourceLinks.length === 0) {
+      reason = `${sourceDev.name} has no connected network cable!`;
+    } else if (sourceLinks.every((l) => l.isBroken)) {
+      reason = `${sourceDev.name}'s network cable is broken!`;
+    } else {
+      // Check if broken link along an otherwise existing topological path
+      const unconstrainedRoute = findPath(sourceId, targetId, devices, links.map(l => ({ ...l, isBroken: false })));
+      if (unconstrainedRoute) {
+        const brokenLink = unconstrainedRoute.links.find(l => {
+          const actual = links.find(al => al.id === l.id);
+          return actual?.isBroken;
+        });
+        if (brokenLink) {
+          const bFrom = devices.find(d => d.id === brokenLink.fromId)?.name || 'Device';
+          const bTo = devices.find(d => d.id === brokenLink.toId)?.name || 'Device';
+          reason = `Request timed out: Cable broken between ${bFrom} and ${bTo}!`;
+        }
+      }
+    }
+
+    return {
+      success: false,
+      sourceDevice: sourceDev,
+      targetDevice: targetDev,
+      path: [],
+      hops: [],
+      oneWayLatency: 0,
+      rtt: 0,
+      ttl: 0,
+      packetsSent: 2,
+      packetsReceived: 0,
+      packetLossPercent: 100,
+      failureReason: reason,
+      timestamp: Date.now(),
+    };
+  }
+
+  // Build hop by hop metadata
+  const hops: PingHop[] = [];
+  for (let i = 0; i < route.path.length - 1; i++) {
+    const fromId = route.path[i];
+    const toId = route.path[i + 1];
+    const link = route.links[i];
+    const fDev = devices.find((d) => d.id === fromId);
+    const tDev = devices.find((d) => d.id === toId);
+
+    hops.push({
+      fromId,
+      fromName: fDev?.name || 'Device',
+      fromIp: fDev?.ip || '0.0.0.0',
+      toId,
+      toName: tDev?.name || 'Device',
+      toIp: tDev?.ip || '0.0.0.0',
+      linkType: link?.linkType || 'ethernet',
+      latencyMs: link?.latencyMs || 5,
+    });
+  }
+
+  const oneWayLatency = route.totalLatency;
+  const rtt = oneWayLatency * 2; // Exact ping round-trip time
+  // Standard TTL starts at 64, decrements 1 per hop device
+  const ttl = Math.max(1, 64 - (hops.length - 1));
+
+  return {
+    success: true,
+    sourceDevice: sourceDev,
+    targetDevice: targetDev,
+    path: route.path,
+    hops,
+    oneWayLatency,
+    rtt,
+    ttl,
+    packetsSent: 2,
+    packetsReceived: 2,
+    packetLossPercent: 0,
+    timestamp: Date.now(),
+  };
 }
 
 /**

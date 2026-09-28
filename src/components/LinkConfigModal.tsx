@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Trash2, AlertTriangle, CheckCircle2, Zap } from 'lucide-react';
+import { X, Trash2, AlertTriangle, CheckCircle2, Zap, Lock } from 'lucide-react';
 import { Link, LinkType } from '../types';
 
 interface LinkConfigModalProps {
@@ -9,6 +9,7 @@ interface LinkConfigModalProps {
   onUpdate: (updated: Partial<Link>) => void;
   onDelete: (id: string) => void;
   onClose: () => void;
+  isLocked?: boolean;
 }
 
 export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
@@ -18,6 +19,7 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
   onUpdate,
   onDelete,
   onClose,
+  isLocked = false,
 }) => {
   const presets: { label: string; latency: number; type: LinkType; tag: string }[] = [
     { label: 'Shipboard LAN', latency: 5, type: 'ethernet', tag: 'Fast' },
@@ -163,16 +165,23 @@ export const LinkConfigModal: React.FC<LinkConfigModalProps> = ({
 
         {/* Footer */}
         <div className="flex items-center justify-between pt-5 mt-5 border-t border-slate-800">
-          <button
-            onClick={() => {
-              onDelete(link.id);
-              onClose();
-            }}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition text-xs"
-          >
-            <Trash2 size={14} />
-            <span>Remove Cable</span>
-          </button>
+          {isLocked ? (
+            <div className="flex items-center gap-1.5 text-[11px] text-amber-400/90 font-medium">
+              <Lock size={12} />
+              <span>Preset Locked (Cannot remove)</span>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                onDelete(link.id);
+                onClose();
+              }}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-rose-400 hover:bg-rose-500/10 hover:text-rose-300 transition text-xs"
+            >
+              <Trash2 size={14} />
+              <span>Remove Cable</span>
+            </button>
+          )}
           <button
             onClick={onClose}
             className="px-4 py-1.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-medium text-xs shadow-md transition"
