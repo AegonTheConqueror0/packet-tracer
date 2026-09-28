@@ -63,17 +63,25 @@ export const SubmissionShowcaseModal: React.FC<SubmissionShowcaseModalProps> = (
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: 820,
-        windowHeight: element.scrollHeight,
+        windowWidth: 780,
+        windowHeight: element.scrollHeight + 100,
         onclone: (clonedDoc) => {
           const receiptEl = clonedDoc.getElementById('pdf-receipt-document');
           if (receiptEl) {
             receiptEl.style.backgroundColor = '#ffffff';
             receiptEl.style.color = '#0f172a';
             receiptEl.style.boxShadow = 'none';
-            receiptEl.style.maxWidth = '800px';
-            receiptEl.style.width = '800px';
-            receiptEl.style.margin = '0 auto';
+            receiptEl.style.maxWidth = '740px';
+            receiptEl.style.width = '740px';
+            receiptEl.style.margin = '0';
+            receiptEl.style.padding = '32px';
+            receiptEl.style.overflow = 'visible';
+          }
+          const wrapper = receiptEl?.parentElement;
+          if (wrapper) {
+            wrapper.style.width = '740px';
+            wrapper.style.maxWidth = '740px';
+            wrapper.style.overflow = 'visible';
           }
         },
       });

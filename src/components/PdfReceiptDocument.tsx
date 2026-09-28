@@ -41,45 +41,46 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
       id="pdf-receipt-document"
       className="bg-white text-slate-900 border-4 border-double border-slate-300 font-sans print:shadow-none print:border-slate-800 print:m-0"
       style={{
-        width: '800px',
+        width: '740px',
         minHeight: '1050px',
         backgroundColor: '#ffffff',
         color: '#0f172a',
-        padding: '40px',
+        padding: '32px',
         margin: '0 auto',
         boxSizing: 'border-box',
+        overflow: 'hidden',
       }}
     >
       {/* Official Maritime Academy Header */}
-      <div className="border-b-2 border-slate-900 pb-5 mb-6" style={{ display: 'block', width: '100%' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', width: '100%' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-            <div style={{ width: '56px', height: '56px', borderRadius: '16px', backgroundColor: '#0f172a', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-              <Anchor size={32} />
+      <div style={{ borderBottom: '2px solid #0f172a', paddingBottom: '16px', marginBottom: '20px', display: 'block', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flex: '1 1 auto', minWidth: 0 }}>
+            <div style={{ width: '44px', height: '44px', borderRadius: '12px', backgroundColor: '#0f172a', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '8px', flexShrink: 0 }}>
+              <Anchor size={24} />
             </div>
-            <div>
-              <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#164e63' }}>
+            <div style={{ minWidth: 0, overflow: 'hidden' }}>
+              <div style={{ fontSize: '10px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.12em', color: '#164e63' }}>
                 ICT Laboratory
               </div>
-              <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#020617', letterSpacing: '-0.02em', lineHeight: '1.1', margin: '2px 0' }}>
+              <h1 style={{ fontSize: '18px', fontWeight: 900, color: '#020617', letterSpacing: '-0.01em', lineHeight: '1.1', margin: '2px 0', whiteSpace: 'normal', wordBreak: 'break-word' }}>
                 OFFICIAL LABORATORY SUBMISSION RECEIPT
               </h1>
-              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 500 }}>
+              <div style={{ fontSize: '11px', color: '#475569', fontWeight: 500, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                 Academic Packet Tracer & Network Topology Verification Record
               </div>
             </div>
           </div>
 
           {/* Receipt Stamp Badge */}
-          <div style={{ textAlign: 'right', flexShrink: 0, border: '2px solid #059669', backgroundColor: '#ecfdf5', borderRadius: '12px', padding: '10px 12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', color: '#047857', fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-              <CheckCircle2 size={14} />
+          <div style={{ textAlign: 'right', flexShrink: 0, border: '2px solid #059669', backgroundColor: '#ecfdf5', borderRadius: '10px', padding: '6px 10px', minWidth: '165px', maxWidth: '180px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '3px', justifyContent: 'flex-end', color: '#047857', fontWeight: 700, fontSize: '10px', textTransform: 'uppercase', letterSpacing: '0.03em', whiteSpace: 'nowrap' }}>
+              <CheckCircle2 size={12} />
               <span>OFFICIALLY VERIFIED</span>
             </div>
-            <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#475569', marginTop: '2px' }}>
+            <div style={{ fontSize: '9px', fontFamily: 'monospace', color: '#475569', marginTop: '2px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               Receipt No: <strong style={{ color: '#0f172a', fontWeight: 700 }}>{submission.id}</strong>
             </div>
-            <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#64748b' }}>
+            <div style={{ fontSize: '9px', fontFamily: 'monospace', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {submission.submittedAt}
             </div>
           </div>
@@ -87,32 +88,32 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
       </div>
 
       {/* Cadet Information Box */}
-      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
-          <div>
-            <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b', display: 'block' }}>
+      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '16px', marginBottom: '20px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', borderBottom: '1px solid #e2e8f0', paddingBottom: '12px', marginBottom: '12px' }}>
+          <div style={{ flex: '1 1 auto', minWidth: 0, overflow: 'hidden' }}>
+            <span style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b', display: 'block' }}>
               Student Cadet Full Name
             </span>
-            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#020617', textTransform: 'uppercase', letterSpacing: '-0.02em', margin: '2px 0 0 0' }}>
+            <h2 style={{ fontSize: '22px', fontWeight: 900, color: '#020617', textTransform: 'uppercase', letterSpacing: '-0.02em', margin: '2px 0 0 0', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
               {submission.studentName}
             </h2>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 16px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '8px 12px', flexShrink: 0 }}>
             <div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
+              <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
                 Assigned Grade
               </div>
-              <div style={{ fontSize: '24px', fontWeight: 900, color: '#047857', fontFamily: 'monospace', lineHeight: '1', marginTop: '2px' }}>
+              <div style={{ fontSize: '20px', fontWeight: 900, color: '#047857', fontFamily: 'monospace', lineHeight: '1', marginTop: '2px' }}>
                 {submission.score} / {submission.maxScore}
               </div>
             </div>
-            <div style={{ height: '32px', width: '1px', backgroundColor: '#e2e8f0' }} />
+            <div style={{ height: '28px', width: '1px', backgroundColor: '#e2e8f0' }} />
             <div>
-              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
+              <div style={{ fontSize: '9px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
                 Result Status
               </div>
-              <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', backgroundColor: '#d1fae5', color: '#065f46', border: '1px solid #6ee7b7', marginTop: '2px' }}>
+              <span style={{ display: 'inline-block', padding: '2px 8px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', backgroundColor: '#d1fae5', color: '#065f46', border: '1px solid #6ee7b7', marginTop: '2px', whiteSpace: 'nowrap' }}>
                 Passed (100%)
               </span>
             </div>
@@ -120,34 +121,34 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
         </div>
 
         {/* Student metadata grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', fontSize: '12px' }}>
-          <div>
-            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1.4fr 1.5fr 1fr', gap: '10px', fontSize: '11px' }}>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            <span style={{ color: '#64748b', display: 'block', fontSize: '9px', textTransform: 'uppercase', fontWeight: 600 }}>
               Cadet ID Number
             </span>
-            <strong style={{ color: '#0f172a', fontFamily: 'monospace', fontSize: '14px' }}>
+            <strong style={{ color: '#0f172a', fontFamily: 'monospace', fontSize: '13px' }}>
               {submission.studentId || 'N/A'}
             </strong>
           </div>
-          <div>
-            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            <span style={{ color: '#64748b', display: 'block', fontSize: '9px', textTransform: 'uppercase', fontWeight: 600 }}>
               Course & Section
             </span>
-            <strong style={{ color: '#0f172a', fontSize: '14px' }}>{submission.courseSection}</strong>
+            <strong style={{ color: '#0f172a', fontSize: '13px', display: 'block', whiteSpace: 'normal', wordBreak: 'break-word' }}>{submission.courseSection}</strong>
           </div>
-          <div>
-            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            <span style={{ color: '#64748b', display: 'block', fontSize: '9px', textTransform: 'uppercase', fontWeight: 600 }}>
               Instructor / Proctor
             </span>
-            <strong style={{ color: '#0f172a', fontSize: '14px' }}>
+            <strong style={{ color: '#0f172a', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', display: 'block' }}>
               {submission.instructorName || 'Prof. Edgardo Rojas'}
             </strong>
           </div>
-          <div>
-            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
+          <div style={{ minWidth: 0, overflow: 'hidden' }}>
+            <span style={{ color: '#64748b', display: 'block', fontSize: '9px', textTransform: 'uppercase', fontWeight: 600 }}>
               Laboratory Module
             </span>
-            <strong style={{ color: '#0f172a', fontSize: '14px' }}>
+            <strong style={{ color: '#0f172a', fontSize: '13px' }}>
               Activity {submission.activityNumber}
             </strong>
           </div>
