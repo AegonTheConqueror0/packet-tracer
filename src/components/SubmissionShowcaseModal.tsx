@@ -57,19 +57,23 @@ export const SubmissionShowcaseModal: React.FC<SubmissionShowcaseModalProps> = (
 
     try {
       const element = receiptPdfRef.current;
-      
+
       const canvas = await html2canvas(element, {
-        scale: 2, // 2x for retina crispness
+        scale: 2.5,
         useCORS: true,
         logging: false,
         backgroundColor: '#ffffff',
-        windowWidth: 850,
+        windowWidth: 820,
+        windowHeight: element.scrollHeight,
         onclone: (clonedDoc) => {
-          // Ensure cloned receipt has explicit standard sRGB styling
           const receiptEl = clonedDoc.getElementById('pdf-receipt-document');
           if (receiptEl) {
             receiptEl.style.backgroundColor = '#ffffff';
             receiptEl.style.color = '#0f172a';
+            receiptEl.style.boxShadow = 'none';
+            receiptEl.style.maxWidth = '800px';
+            receiptEl.style.width = '800px';
+            receiptEl.style.margin = '0 auto';
           }
         },
       });
@@ -81,20 +85,48 @@ export const SubmissionShowcaseModal: React.FC<SubmissionShowcaseModalProps> = (
         format: 'a4',
       });
 
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+      const pageWidthMm = pdf.internal.pageSize.getWidth();
+      const pageHeightMm = pdf.internal.pageSize.getHeight();
+      const imgWidthMm = pageWidthMm;
+      const imgHeightMm = (canvas.height * imgWidthMm) / canvas.width;
 
-      let heightLeft = pdfHeight;
-      let position = 0;
+      if (imgHeightMm <= pageHeightMm) {
+        const offsetY = (pageHeightMm - imgHeightMm) / 2;
+        pdf.addImage(imgData, 'PNG', 0, offsetY, imgWidthMm, imgHeightMm, undefined, 'FAST');
+      } else {
+        const pageHeightPx = (pageHeightMm * canvas.width) / pageWidthMm;
+        const totalPages = Math.ceil(canvas.height / pageHeightPx);
 
-      pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
-      heightLeft -= 297;
+        for (let page = 0; page < totalPages; page++) {
+          const sliceY = page * pageHeightPx;
+          const sliceHeightPx = Math.min(pageHeightPx, canvas.height - sliceY);
 
-      while (heightLeft > 0) {
-        position = heightLeft - pdfHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight, undefined, 'FAST');
-        heightLeft -= 297;
+          const sliceCanvas = document.createElement('canvas');
+          sliceCanvas.width = canvas.width;
+          sliceCanvas.height = sliceHeightPx;
+          const sliceCtx = sliceCanvas.getContext('2d');
+          if (sliceCtx) {
+            sliceCtx.fillStyle = '#ffffff';
+            sliceCtx.fillRect(0, 0, sliceCanvas.width, sliceCanvas.height);
+            sliceCtx.drawImage(
+              canvas,
+              0,
+              sliceY,
+              canvas.width,
+              sliceHeightPx,
+              0,
+              0,
+              canvas.width,
+              sliceHeightPx
+            );
+          }
+
+          const sliceImgData = sliceCanvas.toDataURL('image/png');
+          const sliceHeightMm = (sliceHeightPx * imgWidthMm) / canvas.width;
+
+          if (page > 0) pdf.addPage();
+          pdf.addImage(sliceImgData, 'PNG', 0, 0, imgWidthMm, sliceHeightMm, undefined, 'FAST');
+        }
       }
 
       const safeCadet = submission.studentName.replace(/[^a-zA-Z0-9]/g, '_') || 'Cadet';

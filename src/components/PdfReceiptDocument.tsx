@@ -23,16 +23,15 @@ interface PdfReceiptDocumentProps {
 }
 
 export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submission }) => {
-  // Compute SVG bounding box for crisp topology rendering
   const minX = Math.min(...submission.devices.map((d) => d.x), 100);
   const maxX = Math.max(...submission.devices.map((d) => d.x), 700);
   const minY = Math.min(...submission.devices.map((d) => d.y), 100);
   const maxY = Math.max(...submission.devices.map((d) => d.y), 450);
 
-  const viewBoxWidth = Math.max(680, maxX - minX + 160);
-  const viewBoxHeight = Math.max(380, maxY - minY + 160);
-  const offsetX = minX - 80;
-  const offsetY = minY - 80;
+  const viewBoxWidth = Math.max(680, maxX - minX + 200);
+  const viewBoxHeight = Math.max(420, maxY - minY + 200);
+  const offsetX = minX - 100;
+  const offsetY = minY - 100;
 
   // Generate a mock security hash / barcode representation
   const verificationCode = `HCDC-NET-${submission.activityNumber}-${submission.studentId.replace(/[^0-9]/g, '').slice(-4) || '9821'}-${Date.now().toString().slice(-4)}`;
@@ -40,39 +39,47 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
   return (
     <div
       id="pdf-receipt-document"
-      className="w-full max-w-[800px] mx-auto bg-white text-slate-900 shadow-xl border-4 border-double border-slate-300 p-8 md:p-10 font-sans print:shadow-none print:border-slate-800 print:m-0 print:p-6"
-      style={{ minHeight: '1050px', backgroundColor: '#ffffff', color: '#0f172a' }}
+      className="bg-white text-slate-900 border-4 border-double border-slate-300 font-sans print:shadow-none print:border-slate-800 print:m-0"
+      style={{
+        width: '800px',
+        minHeight: '1050px',
+        backgroundColor: '#ffffff',
+        color: '#0f172a',
+        padding: '40px',
+        margin: '0 auto',
+        boxSizing: 'border-box',
+      }}
     >
       {/* Official Maritime Academy Header */}
-      <div className="border-b-2 border-slate-900 pb-5 mb-6">
-        <div className="flex items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="w-14 h-14 rounded-2xl bg-slate-900 text-amber-400 flex items-center justify-center p-2.5 shadow-md">
+      <div className="border-b-2 border-slate-900 pb-5 mb-6" style={{ display: 'block', width: '100%' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', width: '100%' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+            <div style={{ width: '56px', height: '56px', borderRadius: '16px', backgroundColor: '#0f172a', color: '#fbbf24', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '10px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
               <Anchor size={32} />
             </div>
             <div>
-              <div className="text-[11px] font-extrabold uppercase tracking-widest text-cyan-900">
-                ICT Laboratory 
+              <div style={{ fontSize: '11px', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.15em', color: '#164e63' }}>
+                ICT Laboratory
               </div>
-              <h1 className="text-xl md:text-2xl font-black text-slate-950 tracking-tight leading-tight">
+              <h1 style={{ fontSize: '22px', fontWeight: 900, color: '#020617', letterSpacing: '-0.02em', lineHeight: '1.1', margin: '2px 0' }}>
                 OFFICIAL LABORATORY SUBMISSION RECEIPT
               </h1>
-              <div className="text-xs text-slate-600 font-medium">
+              <div style={{ fontSize: '12px', color: '#475569', fontWeight: 500 }}>
                 Academic Packet Tracer & Network Topology Verification Record
               </div>
             </div>
           </div>
 
           {/* Receipt Stamp Badge */}
-          <div className="text-right shrink-0 border-2 border-emerald-600 bg-emerald-50 rounded-xl p-2.5 px-3">
-            <div className="flex items-center gap-1 justify-end text-emerald-700 font-bold text-xs uppercase tracking-wide">
+          <div style={{ textAlign: 'right', flexShrink: 0, border: '2px solid #059669', backgroundColor: '#ecfdf5', borderRadius: '12px', padding: '10px 12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '4px', justifyContent: 'flex-end', color: '#047857', fontWeight: 700, fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               <CheckCircle2 size={14} />
               <span>OFFICIALLY VERIFIED</span>
             </div>
-            <div className="text-[10px] font-mono text-slate-600 mt-0.5">
-              Receipt No: <strong className="text-slate-900 font-bold">{submission.id}</strong>
+            <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#475569', marginTop: '2px' }}>
+              Receipt No: <strong style={{ color: '#0f172a', fontWeight: 700 }}>{submission.id}</strong>
             </div>
-            <div className="text-[10px] font-mono text-slate-500">
+            <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#64748b' }}>
               {submission.submittedAt}
             </div>
           </div>
@@ -80,32 +87,32 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
       </div>
 
       {/* Cadet Information Box */}
-      <div className="bg-slate-50 border border-slate-300 rounded-xl p-5 mb-6">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 pb-4 mb-4">
+      <div style={{ backgroundColor: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '20px', marginBottom: '24px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '16px', marginBottom: '16px' }}>
           <div>
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+            <span style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b', display: 'block' }}>
               Student Cadet Full Name
             </span>
-            <h2 className="text-2xl font-black text-slate-950 uppercase tracking-tight">
+            <h2 style={{ fontSize: '24px', fontWeight: 900, color: '#020617', textTransform: 'uppercase', letterSpacing: '-0.02em', margin: '2px 0 0 0' }}>
               {submission.studentName}
             </h2>
           </div>
 
-          <div className="flex items-center gap-4 bg-white border border-slate-300 rounded-lg p-2.5 px-4 shadow-xs">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '8px', padding: '10px 16px' }}>
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
                 Assigned Grade
               </div>
-              <div className="text-2xl font-black text-emerald-700 font-mono leading-none">
+              <div style={{ fontSize: '24px', fontWeight: 900, color: '#047857', fontFamily: 'monospace', lineHeight: '1', marginTop: '2px' }}>
                 {submission.score} / {submission.maxScore}
               </div>
             </div>
-            <div className="h-8 w-px bg-slate-200" />
+            <div style={{ height: '32px', width: '1px', backgroundColor: '#e2e8f0' }} />
             <div>
-              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+              <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#64748b' }}>
                 Result Status
               </div>
-              <span className="inline-block px-2.5 py-0.5 rounded-full text-xs font-bold uppercase bg-emerald-100 text-emerald-800 border border-emerald-300">
+              <span style={{ display: 'inline-block', padding: '2px 10px', borderRadius: '9999px', fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', backgroundColor: '#d1fae5', color: '#065f46', border: '1px solid #6ee7b7', marginTop: '2px' }}>
                 Passed (100%)
               </span>
             </div>
@@ -113,34 +120,34 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
         </div>
 
         {/* Student metadata grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '12px', fontSize: '12px' }}>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase font-semibold">
+            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
               Cadet ID Number
             </span>
-            <strong className="text-slate-900 font-mono text-sm">
+            <strong style={{ color: '#0f172a', fontFamily: 'monospace', fontSize: '14px' }}>
               {submission.studentId || 'N/A'}
             </strong>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase font-semibold">
+            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
               Course & Section
             </span>
-            <strong className="text-slate-900">{submission.courseSection}</strong>
+            <strong style={{ color: '#0f172a', fontSize: '14px' }}>{submission.courseSection}</strong>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase font-semibold">
+            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
               Instructor / Proctor
             </span>
-            <strong className="text-slate-900">
+            <strong style={{ color: '#0f172a', fontSize: '14px' }}>
               {submission.instructorName || 'Prof. Edgardo Rojas'}
             </strong>
           </div>
           <div>
-            <span className="text-slate-500 block text-[10px] uppercase font-semibold">
+            <span style={{ color: '#64748b', display: 'block', fontSize: '10px', textTransform: 'uppercase', fontWeight: 600 }}>
               Laboratory Module
             </span>
-            <strong className="text-slate-900">
+            <strong style={{ color: '#0f172a', fontSize: '14px' }}>
               Activity {submission.activityNumber}
             </strong>
           </div>
@@ -148,32 +155,32 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
       </div>
 
       {/* Activity Details Banner */}
-      <div className="mb-6 p-3.5 bg-cyan-900/10 border-l-4 border-cyan-800 rounded-r-xl">
-        <div className="text-[11px] font-bold text-cyan-950 uppercase tracking-wide">
+      <div style={{ marginBottom: '24px', padding: '14px', backgroundColor: 'rgba(14, 116, 144, 0.1)', borderLeft: '4px solid #155e75', borderTopRightRadius: '12px', borderBottomRightRadius: '12px' }}>
+        <div style={{ fontSize: '11px', fontWeight: 700, color: '#083344', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
           Activity #{submission.activityNumber} Completed Objective
         </div>
-        <div className="text-sm font-bold text-slate-900">
+        <div style={{ fontSize: '14px', fontWeight: 700, color: '#0f172a', marginTop: '2px' }}>
           {submission.activityTitle}
         </div>
       </div>
 
       {/* Network Topology Schematic (High Contrast SVG for PDF) */}
-      <div className="mb-6 border border-slate-300 rounded-xl overflow-hidden bg-slate-50">
-        <div className="bg-slate-100 border-b border-slate-300 px-4 py-2 flex items-center justify-between text-xs font-bold text-slate-800">
-          <span className="flex items-center gap-1.5">
-            <Cable size={14} className="text-cyan-800" />
+      <div style={{ marginBottom: '24px', border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+        <div style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Cable size={14} style={{ color: '#155e75' }} />
             Cadet Network Topology Schematic (Proof of Construction)
           </span>
-          <span className="font-mono text-slate-600 text-[11px]">
+          <span style={{ fontFamily: 'monospace', color: '#475569', fontSize: '11px' }}>
             {submission.devices.length} Devices • {submission.links.length} Connected Cables
           </span>
         </div>
 
-        <div className="p-2 flex items-center justify-center bg-white min-h-[260px]">
+        <div style={{ padding: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#ffffff', minHeight: '300px' }}>
           <svg
-            className="w-full h-64"
             viewBox={`${offsetX} ${offsetY} ${viewBoxWidth} ${viewBoxHeight}`}
             preserveAspectRatio="xMidYMid meet"
+            style={{ width: '100%', height: '300px', display: 'block' }}
           >
             <defs>
               <pattern id="pdf-grid" width="24" height="24" patternUnits="userSpaceOnUse">
@@ -285,84 +292,84 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
       </div>
 
       {/* Packet Tracer Simulation Audit Results */}
-      <div className="mb-6 border border-slate-300 rounded-xl overflow-hidden bg-slate-50">
-        <div className="bg-slate-100 border-b border-slate-300 px-4 py-2 flex items-center justify-between text-xs font-bold text-slate-800">
-          <span className="flex items-center gap-1.5">
-            <Activity size={14} className="text-emerald-700" />
+      <div style={{ marginBottom: '24px', border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden', backgroundColor: '#f8fafc' }}>
+        <div style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', padding: '8px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '12px', fontWeight: 700, color: '#1e293b' }}>
+          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Activity size={14} style={{ color: '#047857' }} />
             Packet Tracer Simulation Execution Audit
           </span>
-          <span className="text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full text-[10px] font-bold">
+          <span style={{ color: '#047857', backgroundColor: '#d1fae5', padding: '2px 8px', borderRadius: '9999px', fontSize: '10px', fontWeight: 700 }}>
             VERIFIED SUCCESS
           </span>
         </div>
 
         {submission.pingReport && submission.pingReport.success ? (
-          <div className="p-4 grid grid-cols-1 md:grid-cols-3 gap-3 bg-white text-xs">
-            <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">
+          <div style={{ padding: '16px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px', backgroundColor: '#ffffff', fontSize: '12px' }}>
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', backgroundColor: '#f8fafc' }}>
+              <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, color: '#64748b', display: 'block' }}>
                 Simulated Ping Route
               </span>
-              <strong className="text-slate-900 block text-xs mt-0.5">
+              <strong style={{ color: '#0f172a', display: 'block', fontSize: '12px', marginTop: '2px' }}>
                 {submission.pingReport.sourceDevice.name} ➔ {submission.pingReport.targetDevice.name}
               </strong>
-              <div className="text-[10px] font-mono text-slate-600">
+              <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#475569', marginTop: '2px' }}>
                 {submission.pingReport.sourceDevice.ip} ↔ {submission.pingReport.targetDevice.ip}
               </div>
             </div>
 
-            <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', backgroundColor: '#f8fafc' }}>
+              <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, color: '#64748b', display: 'block' }}>
                 Round-Trip Time (RTT)
               </span>
-              <div className="text-base font-black font-mono text-cyan-800 mt-0.5">
+              <div style={{ fontSize: '18px', fontWeight: 900, fontFamily: 'monospace', color: '#155e75', marginTop: '2px' }}>
                 {submission.pingReport.rtt} ms
               </div>
-              <div className="text-[10px] font-mono text-slate-600">
+              <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#475569', marginTop: '2px' }}>
                 One-Way Latency: {submission.pingReport.oneWayLatency} ms
               </div>
             </div>
 
-            <div className="border border-slate-200 rounded-lg p-2.5 bg-slate-50">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: '8px', padding: '10px', backgroundColor: '#f8fafc' }}>
+              <span style={{ fontSize: '10px', textTransform: 'uppercase', fontWeight: 700, color: '#64748b', display: 'block' }}>
                 Delivery Metrics
               </span>
-              <div className="text-xs font-bold text-emerald-700 flex items-center gap-1 mt-0.5">
+              <div style={{ fontSize: '12px', fontWeight: 700, color: '#047857', display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
                 <CheckCircle2 size={13} />
                 <span>0% Packet Loss (2/2 Echo ACK)</span>
               </div>
-              <div className="text-[10px] font-mono text-slate-600">
+              <div style={{ fontSize: '10px', fontFamily: 'monospace', color: '#475569', marginTop: '2px' }}>
                 TTL: {submission.pingReport.ttl} • Hops: {submission.pingReport.hops.length}
               </div>
             </div>
           </div>
         ) : (
-          <div className="p-3 text-xs text-slate-600 bg-white">
+          <div style={{ padding: '12px', fontSize: '12px', color: '#475569', backgroundColor: '#ffffff' }}>
             Topology criteria validated and simulation connectivity verified during active testing.
           </div>
         )}
       </div>
 
       {/* Automated Rubric Scoring Table */}
-      <div className="mb-6">
-        <div className="text-xs font-bold uppercase tracking-wider text-slate-800 mb-2 flex items-center gap-1.5">
-          <ShieldCheck size={14} className="text-cyan-800" />
+      <div style={{ marginBottom: '24px' }}>
+        <div style={{ fontSize: '12px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.05em', color: '#1e293b', marginBottom: '8px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <ShieldCheck size={14} style={{ color: '#155e75' }} />
           Academic Rubric Criteria Evaluation
         </div>
-        <div className="border border-slate-300 rounded-xl overflow-hidden">
-          <table className="w-full text-left text-xs">
-            <thead className="bg-slate-100 text-slate-700 font-bold border-b border-slate-300 text-[11px]">
+        <div style={{ border: '1px solid #cbd5e1', borderRadius: '12px', overflow: 'hidden' }}>
+          <table style={{ width: '100%', textAlign: 'left', fontSize: '12px', borderCollapse: 'collapse' }}>
+            <thead style={{ backgroundColor: '#f1f5f9', color: '#334155', fontWeight: 700, borderBottom: '1px solid #cbd5e1', fontSize: '11px' }}>
               <tr>
-                <th className="p-2.5">Grading Criterion</th>
-                <th className="p-2.5">Instructor Evaluation Feedback</th>
-                <th className="p-2.5 text-right">Points</th>
+                <th style={{ padding: '10px' }}>Grading Criterion</th>
+                <th style={{ padding: '10px' }}>Instructor Evaluation Feedback</th>
+                <th style={{ padding: '10px', textAlign: 'right' }}>Points</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-200 bg-white">
+            <tbody style={{ backgroundColor: '#ffffff' }}>
               {submission.rubric.map((item, idx) => (
-                <tr key={idx}>
-                  <td className="p-2.5 font-semibold text-slate-900">{item.category}</td>
-                  <td className="p-2.5 text-slate-600">{item.feedback}</td>
-                  <td className="p-2.5 text-right font-mono font-bold text-emerald-700">
+                <tr key={idx} style={{ borderBottom: idx < submission.rubric.length - 1 ? '1px solid #e2e8f0' : 'none' }}>
+                  <td style={{ padding: '10px', fontWeight: 600, color: '#0f172a' }}>{item.category}</td>
+                  <td style={{ padding: '10px', color: '#475569' }}>{item.feedback}</td>
+                  <td style={{ padding: '10px', textAlign: 'right', fontFamily: 'monospace', fontWeight: 700, color: '#047857' }}>
                     {item.score} / {item.maxScore}
                   </td>
                 </tr>
@@ -374,52 +381,52 @@ export const PdfReceiptDocument: React.FC<PdfReceiptDocumentProps> = ({ submissi
 
       {/* Student Technical Notes (if any) */}
       {submission.studentNotes && (
-        <div className="mb-6 border border-slate-300 rounded-xl p-3.5 bg-slate-50">
-          <div className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1 flex items-center gap-1">
+        <div style={{ marginBottom: '24px', border: '1px solid #cbd5e1', borderRadius: '12px', padding: '14px', backgroundColor: '#f8fafc' }}>
+          <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', color: '#475569', marginBottom: '4px', display: 'flex', alignItems: 'center', gap: '4px' }}>
             <FileText size={12} />
             Cadet Technical Notes & Observations:
           </div>
-          <p className="text-xs text-slate-800 italic bg-white p-2.5 rounded-lg border border-slate-200">
+          <p style={{ fontSize: '12px', color: '#1e293b', fontStyle: 'italic', backgroundColor: '#ffffff', padding: '10px', borderRadius: '8px', border: '1px solid #e2e8f0', margin: 0 }}>
             "{submission.studentNotes}"
           </p>
         </div>
       )}
 
       {/* Official Sign-off & Verification Footer */}
-      <div className="mt-8 pt-6 border-t-2 border-slate-900 grid grid-cols-2 md:grid-cols-3 gap-6 items-end">
+      <div style={{ marginTop: '32px', paddingTop: '24px', borderTop: '2px solid #0f172a', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '24px', alignItems: 'flex-end' }}>
         {/* Verification barcode & digital hash */}
-        <div className="space-y-1">
-          <div className="flex items-center gap-1 text-[10px] font-bold uppercase text-slate-600">
+        <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#475569', marginBottom: '4px' }}>
             <QrCode size={13} />
             <span>Digital Security Verification</span>
           </div>
-          <div className="font-mono text-[10px] font-bold text-slate-800 bg-slate-100 border border-slate-300 p-1.5 rounded-md inline-block">
+          <div style={{ fontFamily: 'monospace', fontSize: '10px', fontWeight: 700, color: '#1e293b', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', padding: '6px', borderRadius: '6px', display: 'inline-block', marginBottom: '4px' }}>
             {verificationCode}
           </div>
-          <div className="text-[9px] text-slate-500 font-mono">
+          <div style={{ fontSize: '9px', color: '#64748b', fontFamily: 'monospace' }}>
             Cryptographically logged at {submission.submittedAt}
           </div>
         </div>
 
         {/* Center Department Stamp */}
-        <div className="text-center">
-          <div className="inline-block border-2 border-slate-800 rounded-full px-4 py-1 text-[9px] font-black tracking-widest uppercase text-slate-800">
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ display: 'inline-block', border: '2px solid #1e293b', borderRadius: '9999px', padding: '4px 16px', fontSize: '9px', fontWeight: 900, letterSpacing: '0.2em', textTransform: 'uppercase', color: '#1e293b' }}>
             ★ ICT LAB ★
           </div>
-          <div className="text-[8px] uppercase text-slate-500 tracking-wider mt-1">
+          <div style={{ fontSize: '8px', textTransform: 'uppercase', color: '#64748b', letterSpacing: '0.1em', marginTop: '4px' }}>
             Official System Generated Document
           </div>
         </div>
 
         {/* Instructor Signature Box */}
-        <div className="text-right">
-          <div className="border-b border-slate-800 pb-1 mb-1 font-serif italic text-base text-slate-900">
+        <div style={{ textAlign: 'right' }}>
+          <div style={{ borderBottom: '1px solid #1e293b', paddingBottom: '4px', marginBottom: '4px', fontFamily: 'serif', fontStyle: 'italic', fontSize: '16px', color: '#0f172a' }}>
             {submission.instructorName || 'Prof. Edgardo Rojas'}
           </div>
-          <div className="text-[10px] font-bold uppercase text-slate-700">
+          <div style={{ fontSize: '10px', fontWeight: 700, textTransform: 'uppercase', color: '#334155' }}>
             Instructor / Examiner Signature
           </div>
-          <div className="text-[9px] text-slate-500">
+          <div style={{ fontSize: '9px', color: '#64748b' }}>
             College of Maritime Education • ICT Laboratory
           </div>
         </div>
